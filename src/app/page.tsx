@@ -5,6 +5,7 @@ import { Advocate } from '../types/advocate';
 import Header from '../components/Header';
 import Search from '../components/Search';
 import AdvocateCard from '../components/AdvocateCard';
+import AdvocateCardSkeleton from '../components/AdvocateCardSkeleton';
 
 export default function Home() {
 	const [advocates, setAdvocates] = useState<Advocate[]>([]);
@@ -12,11 +13,13 @@ export default function Home() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [isSearching, setIsSearching] = useState(false);
+	const [isDebouncing, setIsDebouncing] = useState(false);
 
 	// Debounced search effect with server-side fetching
 	useEffect(() => {
 		const fetchAdvocates = async (search?: string) => {
 			try {
+				setIsDebouncing(false);
 				setIsSearching(true);
 				const url = search ? `/api/advocates?search=${encodeURIComponent(search)}` : '/api/advocates';
 				const response = await fetch(url);
@@ -41,6 +44,9 @@ export default function Home() {
 			return;
 		}
 
+		// Show debounce indicator
+		setIsDebouncing(true);
+
 		// Debounced search
 		const timeoutId = setTimeout(() => {
 			fetchAdvocates(searchTerm || undefined);
@@ -55,16 +61,10 @@ export default function Home() {
 
 	const handleSearchReset = () => {
 		setSearchTerm('');
+		// Focus the search input after reset
+		document.getElementById('search')?.focus();
 	};
 
-	if (loading) {
-		return (
-			<main className="m-6">
-				<Header />
-				<p>Loading advocates...</p>
-			</main>
-		);
-	}
 
 	if (error) {
 		return (
@@ -87,18 +87,45 @@ export default function Home() {
 				onChange={handleSearchChange}
 				onReset={handleSearchReset}
 				isSearching={isSearching}
+				isDebouncing={isDebouncing}
 			/>
 
 			{advocates.length === 0 ? (
-				<p className="text-gray-600 text-center">No advocates found matching your search.</p>
+				// Show skeleton when loading (initial load, after clearing search, or while debouncing)
+				(loading || (!searchTerm && (isSearching || isDebouncing))) ? (
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						{Array.from({ length: 6 }).map((_, i) => (
+							<AdvocateCardSkeleton key={i} />
+						))}
+					</div>
+				) : (
+					// Show "no results" message when search returned nothing
+					<div className="text-center py-16">
+						<p className="text-xl text-gray-900 mb-2">No advocates match your search</p>
+						<button
+							onClick={handleSearchReset}
+							className="text-gray-500 hover:text-solace transition-colors"
+						>
+							Try searching by name, city, or specialty
+						</button>
+					</div>
+				)
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{advocates.map((advocate) => (
-						<AdvocateCard
+					{advocates.map((advocate, index) => (
+						<div
 							key={advocate.id}
-							advocate={advocate}
-							searchTerm={searchTerm}
-						/>
+							style={{
+								animation: 'fadeIn 0.4s ease-out forwards',
+								animationDelay: `${index * 40}ms`,
+								opacity: 0
+							}}
+						>
+							<AdvocateCard
+								advocate={advocate}
+								searchTerm={searchTerm}
+							/>
+						</div>
 					))}
 				</div>
 			)}
