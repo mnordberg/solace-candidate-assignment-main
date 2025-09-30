@@ -13,7 +13,7 @@ export default function Search({ value, onChange, onReset, isSearching }: Search
 	};
 
 	return (
-		<div className="mt-12 mb-6 relative">
+		<div className="mt-6 mb-6 relative">
 			<input
 				id="search"
 				type="text"
