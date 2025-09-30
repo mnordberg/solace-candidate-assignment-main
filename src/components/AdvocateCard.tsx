@@ -66,7 +66,7 @@ export default function AdvocateCard({ advocate, searchTerm }: AdvocateCardProps
 				</h3>
 				<a
 					href={`tel:${advocate.phoneNumber}`}
-					className="text-solace hover:text-solace-700 font-medium"
+					className="text-solace hover:text-solace-700 font-medium focus:outline-none focus:ring-2 focus:ring-solace rounded"
 				>
 					{formatPhoneNumber(advocate.phoneNumber)}
 				</a>
@@ -101,7 +101,7 @@ export default function AdvocateCard({ advocate, searchTerm }: AdvocateCardProps
 					{!showAllSpecialties && remaining > 0 && (
 						<button
 							onClick={() => setShowAllSpecialties(true)}
-							className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-gray-200 transition-colors"
+							className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-solace"
 						>
 							+ {remaining} more
 						</button>
@@ -109,7 +109,7 @@ export default function AdvocateCard({ advocate, searchTerm }: AdvocateCardProps
 					{showAllSpecialties && (
 						<button
 							onClick={() => setShowAllSpecialties(false)}
-							className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-gray-200 transition-colors"
+							className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-solace"
 						>
 							Show less
 						</button>

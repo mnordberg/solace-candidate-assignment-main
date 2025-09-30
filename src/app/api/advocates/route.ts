@@ -1,12 +1,19 @@
 import db from '../../../db';
 import { advocates } from '../../../db/schema';
-import { or, ilike, sql } from 'drizzle-orm';
+import { or, ilike, sql, asc, desc, count } from 'drizzle-orm';
 
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
 	const search = searchParams.get('search');
+	const sortBy = searchParams.get('sortBy') || 'fullName';
+	const sortOrder = searchParams.get('sortOrder') || 'asc';
+	const page = parseInt(searchParams.get('page') || '1');
+	const limit = parseInt(searchParams.get('limit') || '20');
 
-	let data;
+	const offset = (page - 1) * limit;
+
+	let query = db.select().from(advocates);
+	let countQuery = db.select({ count: count() }).from(advocates);
 
 	if (search && search.trim() !== '') {
 		// Split search into terms, removing commas and extra spaces
@@ -32,14 +39,44 @@ export async function GET(request: Request) {
 			);
 		});
 
-		// All terms must match (AND logic)
-		data = await db
-			.select()
-			.from(advocates)
-			.where(sql`${sql.join(termConditions, sql` AND `)}`);
-	} else {
-		data = await db.select().from(advocates);
+		const whereClause = sql`${sql.join(termConditions, sql` AND `)}`;
+		query = query.where(whereClause) as typeof query;
+		countQuery = countQuery.where(whereClause) as typeof countQuery;
 	}
 
-	return Response.json({ data });
+	const sortFn = sortOrder === 'desc' ? desc : asc;
+
+	// Apply sorting and pagination
+	switch (sortBy) {
+		case 'experience':
+			query = query.orderBy(sortFn(advocates.yearsOfExperience)).limit(limit).offset(offset) as typeof query;
+			break;
+		case 'degree':
+			query = query.orderBy(sortFn(advocates.degree)).limit(limit).offset(offset) as typeof query;
+			break;
+		case 'fullName':
+		default:
+			// Default to fullName sorting
+			query = query
+				.orderBy(sortFn(advocates.lastName), sortFn(advocates.firstName))
+				.limit(limit)
+				.offset(offset) as typeof query;
+			break;
+	}
+
+	// Execute queries
+	const [data, totalResult] = await Promise.all([query, countQuery]);
+
+	const total = totalResult[0]?.count || 0;
+	const totalPages = Math.ceil(total / limit);
+
+	return Response.json({
+		data,
+		pagination: {
+			page,
+			limit,
+			total,
+			totalPages
+		}
+	});
 }

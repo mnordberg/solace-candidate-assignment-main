@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "advocates" (
 	"years_of_experience" integer NOT NULL,
 	"phone_number" text NOT NULL,
 	"created_at" timestamp DEFAULT CURRENT_TIMESTAMP
-);
+);--> statement-breakpoint
 
-ALTER TABLE "advocates" RENAME COLUMN "payload" TO "specialties";
+ALTER TABLE "advocates" RENAME COLUMN "payload" TO "specialties";--> statement-breakpoint
 ALTER TABLE "advocates" ALTER COLUMN "phone_number" TYPE text USING "phone_number"::text;
