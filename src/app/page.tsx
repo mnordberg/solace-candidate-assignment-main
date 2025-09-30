@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Advocate } from '../types/advocate';
 import Header from '../components/Header';
 import Search from '../components/Search';
+import AdvocateCard from '../components/AdvocateCard';
 
 export default function Home() {
 	const [advocates, setAdvocates] = useState<Advocate[]>([]);
@@ -91,41 +92,15 @@ export default function Home() {
 			{advocates.length === 0 ? (
 				<p className="text-gray-600 text-center">No advocates found matching your search.</p>
 			) : (
-				<table className="w-full border-collapse">
-					<thead>
-						<tr className="bg-gray-100">
-							<th className="border border-gray-300 px-4 py-2 text-left">First Name</th>
-							<th className="border border-gray-300 px-4 py-2 text-left">Last Name</th>
-							<th className="border border-gray-300 px-4 py-2 text-left">City</th>
-							<th className="border border-gray-300 px-4 py-2 text-left">Degree</th>
-							<th className="border border-gray-300 px-4 py-2 text-left">Specialties</th>
-							<th className="border border-gray-300 px-4 py-2 text-left">Years of Experience</th>
-							<th className="border border-gray-300 px-4 py-2 text-left">Phone Number</th>
-						</tr>
-					</thead>
-					<tbody>
-						{advocates.map((advocate) => {
-							return (
-								<tr
-									key={advocate.id}
-									className="hover:bg-gray-50"
-								>
-									<td className="border border-gray-300 px-4 py-2">{advocate.firstName}</td>
-									<td className="border border-gray-300 px-4 py-2">{advocate.lastName}</td>
-									<td className="border border-gray-300 px-4 py-2">{advocate.city}</td>
-									<td className="border border-gray-300 px-4 py-2">{advocate.degree}</td>
-									<td className="border border-gray-300 px-4 py-2">
-										{advocate.specialties.map((s, index) => (
-											<div key={index}>{s}</div>
-										))}
-									</td>
-									<td className="border border-gray-300 px-4 py-2">{advocate.yearsOfExperience}</td>
-									<td className="border border-gray-300 px-4 py-2">{advocate.phoneNumber}</td>
-								</tr>
-							);
-						})}
-					</tbody>
-				</table>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					{advocates.map((advocate) => (
+						<AdvocateCard
+							key={advocate.id}
+							advocate={advocate}
+							searchTerm={searchTerm}
+						/>
+					))}
+				</div>
 			)}
 		</main>
 	);
