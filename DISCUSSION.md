@@ -17,7 +17,7 @@ The starting point is a simple React/Next.js application with a searchable table
 
 ### My Approach to Code Review
 
-I started by reading through the codebase systematically, looking for:
+I started by reading through the codebase systematically (with the help of Claude Code), looking for:
 - **Runtime errors** that would crash the app
 - **Type safety issues** and improper use of TypeScript
 - **React anti-patterns** or violation of best practices
@@ -208,10 +208,10 @@ Specialties is a JSONB array field and not natively searchable. PostgreSQL's gen
 
 ## What's Production-Ready
 
-The app is now fully functional for production use:
+The app is now fully functional:
 
 **1st Tier Scalability** - Server-side search, sort, pagination with database indexes (not sufficient for global usage, but good for an MVP)
-**UX** - Intuitive layout, debounced search, loading states, empty states
+**UX** - Intuitive layout, debounced search, loading & empty states
 **Accessibility** - Full ARIA support, semantic HTML, keyboard navigation
 **Type Safety** - Proper TypeScript interfaces throughout
 **Error Handling** - Try/catch blocks, user-friendly error messages
@@ -226,10 +226,9 @@ The app is now fully functional for production use:
 If I had more time, I'd add:
 
 **Advanced Filtering:**
-- Multi-select dropdown for specialties
-- City search (autocomplete for large lists)
+- Multi-select dropdown for specialties, degrees
+- City search (autocomplete, current location, etc.)
 - Years of experience range slider
-- Degree filter (dropdown)
 
 **Visual Improvements:**
 - Link through to Advocate page or next steps
@@ -242,4 +241,5 @@ If I had more time, I'd add:
 - Front-end caching like TanStack Query
 - Redis caching for popular searches
 - Bundle size optimization
-- Add monitoring/analytics (**important:** this is a consumer-facing page and behavior should be tracked)
+- Dedicated index (Elastic/Azure Search) depending on scale?
+- Production-ready monitoring/analytics (**important:** this is a consumer-facing page and behavior should be tracked)
